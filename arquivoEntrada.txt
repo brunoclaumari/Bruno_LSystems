@@ -1,0 +1,6 @@
+g : L, R, F, +, -
+n : 2
+i : L
+a : 90º
+p1 : L = +RF - LF L - F R+
+p2 : R = -LF + RF R + F L-

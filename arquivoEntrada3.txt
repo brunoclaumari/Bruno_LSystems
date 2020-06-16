@@ -1,0 +1,5 @@
+g : F, +, -
+n : 1
+i : F-F-F-F
+a : 90º
+p1 : F = F - F + F + FF - F - F + F
