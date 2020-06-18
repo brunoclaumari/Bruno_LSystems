@@ -5,7 +5,14 @@
  */
 package geradores;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -14,63 +21,186 @@ import java.util.HashMap;
 public class GeraCoordenadas {
 
     public double angCorrente = 0;
+    public int maiorX;
+    public int menorX = Integer.MAX_VALUE;
+    public int maiorY;
+    public int menorY = Integer.MAX_VALUE;
+    private double primeiroX;
+    private double primeiroY;
 
-    public HashMap<String, VetorLinha> listaDePontos = new HashMap<>();
+    public String stringSvgFinal = "";
 
-    private VetorLinha consumo(char letra, VetorLinha posAnterior, double tamanhoLinha, double anguloDaGramatica) {
+    public GeraCoordenadas() {
+
+    }
+
+    public GeraCoordenadas(double primeiroX, double primeiroY) {
+        this.primeiroX = primeiroX;
+        this.primeiroY = primeiroY;
+    }
+
+    public double getPrimeiroX() {
+        return primeiroX;
+    }
+
+    public void setPrimeiroX(double primeiroX) {
+        this.primeiroX = primeiroX;
+    }
+
+    public double getPrimeiroY() {
+        return primeiroY;
+    }
+
+    public void setPrimeiroY(double primeiroY) {
+        this.primeiroY = primeiroY;
+    }
+
+    //public HashMap<String, VetorLinha> listaDePontos = new HashMap<>();
+    public List<VetorLinha> listaDePontos = new ArrayList<>();
+
+    public void consumo(char letra, double comprLinha, double espesLinha, double anguloDaGramatica) {
         VetorLinha posAtual = new VetorLinha();
-        posAtual.setxInicial(posAnterior.getxFinal());
-        posAtual.setyInicial(posAnterior.getyFinal());
+        if (listaDePontos.isEmpty()) {
+            //Seta o primeiro ponto de partida das coordenadas do desenho
+            posAtual.setxInicial(getPrimeiroX());
+            posAtual.setyInicial(getPrimeiroY());
+
+        } else {
+            int posicao = listaDePontos.size() - 1;
+            VetorLinha ultimo = listaDePontos.get(posicao);
+
+            posAtual.setxInicial(ultimo.getxFinal());
+            posAtual.setyInicial(ultimo.getyFinal());
+        }
 
         //angCorrente = posAnterior.getAngulo();
         double angEspecifico;
         boolean temDesenho;
+        double auxx;
 
         switch (letra) {
             case 'F':
-                /*
-                posAtual.setTemLinha(true);
-                double x = Math.cos(Math.toRadians(90 + angCorrente)) * tamanhoLinha;
-                double y = Math.sin(Math.toRadians(90 + angCorrente)) * tamanhoLinha;
-                posAtual.setxFinal(x);
-                posAtual.setyFinal(y);
-                 */
                 angEspecifico = 90;
                 temDesenho = true;
-                passaParametros(posAnterior, temDesenho, angEspecifico, tamanhoLinha);
+                passaParametros(posAtual, temDesenho, angEspecifico, comprLinha);
                 break;
-            case 'R':
+            /*
+                case 'R':
                 angEspecifico = 0;
                 temDesenho = true;
-                passaParametros(posAnterior, temDesenho, angEspecifico, tamanhoLinha);
+                passaParametros(posAtual, temDesenho, angEspecifico, tamanhoLinha);
                 break;
             case 'L':
                 angEspecifico = 180;
                 temDesenho = true;
-                passaParametros(posAnterior, temDesenho, angEspecifico, tamanhoLinha);
+                passaParametros(posAtual, temDesenho, angEspecifico, tamanhoLinha);
                 break;
+             */
             case '+':
-                angCorrente = anguloDaGramatica;
+                //auxx=angCorrente;
+                //angCorrente =(auxx+anguloDaGramatica)%360;
+                angCorrente += anguloDaGramatica;
                 break;
             case '-':
-                angCorrente = anguloDaGramatica * -1;
+                //auxx=angCorrente;
+                //angCorrente =(auxx+360-anguloDaGramatica)%360;
+                angCorrente += anguloDaGramatica * -1;
                 break;
             case 'f':
                 angEspecifico = 90;
                 temDesenho = false;
-                passaParametros(posAnterior, temDesenho, angEspecifico, tamanhoLinha);
+                passaParametros(posAtual, temDesenho, angEspecifico, comprLinha);
                 break;
 
         }
-        return posAtual;
+        //return posAtual;
     }
 
-    private void passaParametros(VetorLinha vetor, boolean desenhar, double anguloEspecif, double tamLinha) {
+    private void passaParametros(VetorLinha vetor, boolean desenhar,
+            double anguloEspecif, double comprimentoLinha) {
+
+        double radCorrente = anguloEspecif + angCorrente;
+
         vetor.setTemLinha(desenhar);
-        double x = Math.cos(Math.toRadians(anguloEspecif + angCorrente)) * tamLinha;
-        double y = Math.sin(Math.toRadians(anguloEspecif + angCorrente)) * tamLinha;
-        
+        double x = Math.cos(Math.toRadians(radCorrente)) * comprimentoLinha;
+        double y = Math.sin(Math.toRadians(radCorrente)) * comprimentoLinha;
+        DecimalFormat df = new DecimalFormat("#.###");
+        x = Double.parseDouble(df.format(vetor.getxInicial())) + Double.parseDouble(df.format(x));
+        y = Double.parseDouble(df.format(vetor.getyInicial())) + Double.parseDouble(df.format(y));
+
         vetor.setxFinal(x);
         vetor.setyFinal(y);
+
+        adicionaCoordenada(vetor, GeraDesenho.espessuraDaLinha);
+
+        listaDePontos.add(vetor);
     }
+
+    public String stringSVG() {
+        String arquivoSvg = "<svg xmlns=\"http://www.w3.org/2000/svg\">\n";
+
+        arquivoSvg += stringSvgFinal;
+
+        arquivoSvg += "</svg>";
+
+        return arquivoSvg;
+    }
+
+    void adicionaCoordenada(VetorLinha linha, double espLinha) {
+
+        String addPonto = "<line ";
+        addPonto += String.format("x1=\"%1$.3f\" y1=\"%2$.3f\" x2=\"%3$.3f\" y2=\"%4$.3f\"",
+                linha.getxInicial(),
+                linha.getyInicial(),
+                linha.getxFinal(),
+                linha.getyFinal());
+        addPonto += String.format(" style=\"stroke:black;stroke-width:%s\" />\n", espLinha);
+
+        stringSvgFinal += addPonto;
+    }
+
+    public void escreveArquivoSvg(String svg) throws IOException {
+
+        String path = ".\\zArquivoSVG\\lsystems.svg";
+        //try (BufferedWriter bw = new BufferedWriter(new FileWriter(path, true)))//Adiciona item ao arquivo existente
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(path))) {//Sustitui o arquivo existente
+            bw.append(svg);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 }
+
+
+/*
+
+public void testaMaiorX(int comp) {
+        if (comp > maiorX) {
+            maiorX = comp;
+        }
+
+    }
+
+    public void testaMenorX(int comp) {
+        if (comp < menorX) {
+            menorX = comp;
+        }
+    }
+
+    public void testaMaiorY(int comp) {
+        if (comp > maiorY) {
+            maiorY = comp;
+        }
+
+    }
+
+    public void testaMenorY(int comp) {
+        if (comp < menorY) {
+            menorY = comp;
+        }
+    }
+
+ */

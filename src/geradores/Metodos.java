@@ -7,16 +7,11 @@ package geradores;
 
 import fractais.GramaticaLinguagem;
 import fractais.RegraProducao;
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.function.Consumer;
 
 /**
  *

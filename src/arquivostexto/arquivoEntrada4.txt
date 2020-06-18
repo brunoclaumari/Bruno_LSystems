@@ -1,0 +1,6 @@
+g : F,f,+, -
+n : 3
+i : F+F+F+F
+a : 90º
+p1 : F = F+f-FF+F+FF+Ff+FF-f+FF-F-FF-Ff-FFF
+p2 : f = ffffff

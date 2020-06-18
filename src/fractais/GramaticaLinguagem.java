@@ -63,6 +63,7 @@ public class GramaticaLinguagem {
         this.stringFinal = stringFinal;
     } 
     
+    
     public double getTamanhoLinha() {
         return tamanhoLinha;
     }
@@ -70,6 +71,7 @@ public class GramaticaLinguagem {
     public void setTamanhoLinha(double tamanhoLinha) {
         this.tamanhoLinha = tamanhoLinha;
     }
+    
     
 
     public void adicionarProducao(RegraProducao rg) {
